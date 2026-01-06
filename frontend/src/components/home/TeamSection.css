@@ -1,0 +1,368 @@
+
+/* ============================================
+   LEADERS/TEAM SECTION STYLES
+   ============================================ */
+
+.leaders-section {
+  background-color: #ffffff;
+  padding: 80px 20px;
+  overflow: hidden;
+}
+
+/* Section Header */
+.leaders-section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.leaders-section-subtitle {
+  color:  #0a9396;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.leaders-section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color:  #333;
+  margin-bottom: 15px;
+  line-height: 1.2;
+}
+
+.leaders-section-description {
+  font-size:  1rem;
+  color:  #555;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Category Section */
+.leaders-category-section {
+  margin-bottom:  60px;
+}
+
+. leaders-category-title {
+  font-size: 1.8rem;
+  font-weight:  700;
+  color: #1a1a1a;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* Leaders Grid */
+.leaders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Leader Card */
+.leader-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 30px 20px;
+  text-align:  center;
+  position: relative;
+  transition: all 0.3s ease;
+  cursor:  default;
+}
+
+.leader-card:hover {
+  transform:  translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Leader Photo */
+.leader-photo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.leader-photo img {
+  width: 120px;
+  height: 120px;
+  border-radius:  50%;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.leader-card:hover .leader-photo img {
+  transform: scale(1.05);
+}
+
+.leader-placeholder-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background:  linear-gradient(135deg, #0a9396 0%, #0d7a7f 100%);
+  font-size: 48px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  user-select: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Leader Info */
+.leader-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.leader-position {
+  font-size:  1rem;
+  color:  #0a9396;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.leader-bio {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.5;
+  min-height: 60px;
+}
+
+/* Social Toggle Button */
+.leader-social-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #0a9396;
+  color:  #fff;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(10, 147, 150, 0.3);
+}
+
+.leader-social-toggle: hover {
+  background: #0d7a7f;
+  transform: scale(1.1);
+}
+
+.leader-social-toggle.active {
+  background: #ae2012;
+  transform: rotate(45deg);
+}
+
+.leader-social-toggle i {
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+/* Social Links Dropdown */
+.leader-social-links {
+  display: none;
+  position: absolute;
+  top: 65px;
+  right: 20px;
+  flex-direction:  column;
+  gap: 10px;
+  background: white;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow:  0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 9;
+  animation: slideDown 0.3s ease;
+}
+
+.leader-social-links.active {
+  display: flex;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform:  translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform:  translateY(0);
+  }
+}
+
+.leader-social-link {
+  color: #0a9396;
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  background: #f5f5f5;
+}
+
+.leader-social-link:hover {
+  color: #fff;
+  background: #0a9396;
+  transform: scale(1.1);
+}
+
+.leader-social-link.email:hover {
+  background: #ea4335;
+}
+
+.leader-social-link.linkedin:hover {
+  background: #0077b5;
+}
+
+. leader-social-link.github:hover {
+  background: #333;
+}
+
+.leader-social-link.website:hover {
+  background: #0a9396;
+}
+
+.leader-social-link.phone:hover {
+  background: #34a853;
+}
+
+/* View Previous Button */
+.leaders-view-previous {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.leaders-view-previous-btn {
+  display: inline-block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0a9396 0%, #0d7a7f 100%);
+  padding: 14px 32px;
+  border-radius:  30px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(10, 147, 150, 0.3);
+  transition: all 0.3s ease;
+}
+
+.leaders-view-previous-btn:hover {
+  background: linear-gradient(135deg, #ae2012 0%, #8b1a0e 100%);
+  box-shadow: 0 8px 24px rgba(174, 32, 18, 0.4);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Loading State */
+.leaders-loading {
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top:  5px solid #0a9396;
+  border-radius:  50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.leaders-loading p {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* No Data State */
+.leaders-no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 1.1rem;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .leaders-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+  }
+}
+
+@media (max-width:  768px) {
+  .leaders-section {
+    padding: 60px 15px;
+  }
+
+  .leaders-section-title {
+    font-size: 2rem;
+  }
+
+  .leaders-category-title {
+    font-size: 1.5rem;
+  }
+
+  .leaders-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    gap: 20px;
+  }
+
+  .leader-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaders-section-title {
+    font-size: 1.75rem;
+  }
+
+  .leaders-section-subtitle {
+    font-size: 16px;
+  }
+
+  . leader-photo img,
+  .leader-placeholder-photo {
+    width: 100px;
+    height: 100px;
+  }
+
+  . leader-placeholder-photo {
+    font-size: 40px;
+  }
+
+  . leaders-view-previous-btn {
+    padding: 12px 24px;
+    font-size: 0.95rem;
+  }
+}

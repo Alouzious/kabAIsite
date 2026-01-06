@@ -1,0 +1,424 @@
+/* University Navbar Styles */
+
+/* Only restrict overflow where needed */
+body {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Top Site Content Styling */
+.top_site_content {
+    background: #fbbf24;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 14px;
+    padding: 8px 0;
+}
+
+.contact-link {
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.contact-link:hover {
+    color: #60a5fa !important;
+    text-decoration: none;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-link:hover {
+    background-color: #f3f4f6;
+    color: #1e40af !important;
+    transform: translateY(-2px);
+}
+
+/* Quick Links and Bootstrap Dropdown Z-index Fix */
+.dropdown {
+    position: relative;
+    z-index: 1060;
+}
+
+.dropdown-menu {
+    z-index: 1060 !important;
+}
+
+.quick-links-dropdown {
+    min-width: 200px;
+    z-index: 1060 !important;
+}
+
+.dropdown-toggle {
+    z-index: 1061;
+}
+
+.quick-links-dropdown .dropdown-item:hover {
+    background-color: #eff6ff;
+    color: #1e40af;
+}
+
+/* Main Navbar Styling */
+.navbar {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%) !important;
+    padding: 0 56px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1030;
+    height: auto;
+    border-bottom: 5px solid var(--secondary-color, #f59e0b);
+}
+
+.navbar .container-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 100%;
+    padding: 0;
+}
+
+/* Navigation Links */
+.navbar-nav {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
+    margin: 0 56px;
+    padding: 0;
+    width: calc(100% - 112px);
+    max-width: calc(100% - 112px);
+}
+
+.navbar-nav.d-flex.flex-row {
+    gap: 0;
+    justify-content: space-between;
+}
+
+.nav-item {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 8px;
+}
+
+.nav-item:first-child {
+    margin-left: 0;
+}
+
+.nav-item:last-child {
+    flex: 0 0 auto;
+    margin-right: 0;
+    margin-left: 16px;
+}
+
+.nav-link {
+    color: #ffffff !important;
+    font-weight: 500;
+    padding: 15px 12px !important;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    text-decoration: none;
+    font-size: 15px;
+    display: inline-block;
+    white-space: nowrap;
+    text-align: center;
+    min-width: fit-content;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    border-bottom-color: #fbbf24;
+    color: goldenrod !important;
+    transform: translateY(-2px);
+}
+
+/* Hover Content Panels */
+.hover-content-panel {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    width: 350px;
+    max-width: 90vw;
+    background: #ffffff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-top: 3px solid #fbbf24;
+    padding: 20px;
+    z-index: 1050;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    border-radius: 0 0 8px 8px;
+    pointer-events: none;
+}
+
+.hover-content-panel.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.nav-item:nth-last-child(1) .hover-content-panel,
+.nav-item:nth-last-child(2) .hover-content-panel {
+    left: auto;
+    right: 0;
+    transform: translateY(-10px);
+}
+
+.nav-item:nth-last-child(1) .hover-content-panel.show,
+.nav-item:nth-last-child(2) .hover-content-panel.show {
+    transform: translateY(0);
+}
+
+.hover-content-panel .container {
+    max-width: 100%;
+    padding: 0;
+}
+
+.hover-content-panel h6.dropdown-header {
+    color: #1e40af;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #eff6ff;
+}
+
+.hover-content-panel ul {
+    margin: 0;
+    padding: 0;
+}
+
+.hover-content-panel li {
+    margin-bottom: 8px;
+}
+
+.hover-content-panel a {
+    color: #374151;
+    text-decoration: none;
+    padding: 6px 0;
+    display: block;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.hover-content-panel a:hover {
+    color: #1e40af;
+    padding-left: 10px;
+    background-color: #eff6ff;
+    border-radius: 4px;
+    padding-right: 10px;
+}
+
+/* Search Button */
+.btn-outline-light {
+    padding: 8px 16px;
+    border-radius: 25px;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.btn-outline-light:hover {
+    background: #fbbf24;
+    border-color: #fbbf24;
+    color: #1f2937;
+    transform: scale(1.05);
+}
+
+/* Mobile Responsive */
+@media (max-width: 991.98px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 20px;
+    }
+
+    .navbar .container-fluid {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        padding: 0;
+    }
+
+    .navbar-nav {
+        flex-direction: column;
+        width: 100%;
+        gap: 0;
+        justify-content: flex-start;
+        margin: 0;
+    }
+
+    .navbar-nav.d-flex.flex-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .nav-item {
+        flex: none;
+        text-align: left;
+        width: 100%;
+        justify-content: flex-start;
+        margin: 0;
+    }
+
+    .nav-item:last-child {
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
+    }
+
+    .nav-link {
+        padding: 12px 20px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+        text-align: left;
+    }
+
+    .hover-content-panel {
+        position: static;
+        transform: none;
+        opacity: 1;
+        visibility: visible;
+        display: none;
+        box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.1);
+        background: #f8fafc;
+    }
+
+    .hover-content-panel.show {
+        display: block;
+    }
+
+    .btn-outline-light {
+        width: 100%;
+        text-align: center;
+        margin: 10px 0;
+    }
+}
+
+/* Tablet Responsive */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .navbar {
+        padding: 0 40px;
+    }
+
+    .navbar-nav {
+        margin: 0 30px;
+    }
+
+    .nav-link {
+        padding: 15px 8px !important;
+        font-size: 14px;
+    }
+
+    .nav-item {
+        margin: 0 6px;
+    }
+
+    .nav-item:last-child {
+        margin-left: 12px;
+    }
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+    .navbar {
+        padding: 0 56px;
+    }
+
+    .navbar-nav {
+        margin: 0 56px;
+    }
+
+    .nav-link {
+        padding: 15px 12px !important;
+    }
+
+    .nav-item {
+        margin: 0 10px;
+    }
+
+    .nav-item:last-child {
+        margin-left: 20px;
+    }
+}
+
+/* Search Modal Enhancements */
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #1e40af, #1e3a8a);
+    color: #ffffff;
+    border-radius: 12px 12px 0 0;
+}
+
+.form-control:focus {
+    border-color: #1e40af;
+    box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
+}
+
+/* Animation for navbar on scroll */
+.navbar.scrolled {
+    padding: 5px 56px;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 991.98px) {
+    .navbar.scrolled {
+        padding: 5px 20px;
+    }
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    opacity: 0.5;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    outline: 0;
+}
+
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 10% auto;
+    max-width: 500px;
+}
