@@ -1,0 +1,36 @@
+.indabax-resources {
+  padding: 2rem;
+}
+.resources-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+.resource-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 1rem;
+  width: 260px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.resource-type {
+  font-size: 0.95rem;
+  color: #0077b5;
+  font-weight: 500;
+}
+.resource-meta {
+  font-size: 0.85rem;
+  color: #666;
+}
+.resource-card a {
+  color: #222;
+  text-decoration: underline;
+  font-size: 0.98rem;
+}
+.resource-card a:hover {
+  color: #0077b5;
+}

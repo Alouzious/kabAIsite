@@ -1,3 +1,11 @@
+from .models import LearningResource
+from .serializers import LearningResourceSerializer
+# API view for learning resources
+from rest_framework import generics
+
+class LearningResourceListView(generics.ListAPIView):
+    queryset = LearningResource.objects.filter(is_published=True)
+    serializer_class = LearningResourceSerializer
 from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -7,15 +15,54 @@ from .models import (
     IndabaxEvent,
     IndabaxSpeaker,
     IndabaxSession,
-    IndabaxGallery
+    IndabaxGallery,
+    HeroSection,
+    Leader
 )
 from .serializers import (
     IndabaxSettingsSerializer,
     IndabaxEventSerializer,
     IndabaxSpeakerSerializer,
     IndabaxSessionSerializer,
-    IndabaxGallerySerializer
+    IndabaxGallerySerializer,
+    HeroSectionSerializer,
+    LeaderSerializer
 )
+# IndabaX main page view
+from django.views.generic import TemplateView
+from django.shortcuts import render
+
+def indabax_main(request):
+    hero = HeroSection.objects.filter(is_active=True).first()
+    current_leaders = Leader.objects.filter(is_current=True).order_by('name')
+    context = {
+        'hero': hero,
+        'current_leaders': current_leaders,
+    }
+    return render(request, 'indabax/main.html', context)
+
+def indabax_leaders(request):
+    current_leaders = Leader.objects.filter(is_current=True).order_by('name')
+    archived_leaders = {}
+    for year in Leader.objects.values_list('year', flat=True).distinct().order_by('-year'):
+        archived = Leader.objects.filter(year=year, is_current=False).order_by('name')
+        if archived.exists():
+            archived_leaders[year] = archived
+    context = {
+        'current_leaders': current_leaders,
+        'archived_leaders': archived_leaders,
+    }
+    return render(request, 'indabax/leaders.html', context)
+# API views for hero and leaders
+from rest_framework import generics
+
+class HeroSectionListView(generics.ListAPIView):
+    queryset = HeroSection.objects.all()
+    serializer_class = HeroSectionSerializer
+
+class LeaderListView(generics.ListAPIView):
+    queryset = Leader.objects.all()
+    serializer_class = LeaderSerializer
 
 class IndabaxSettingsViewSet(viewsets.ReadOnlyModelViewSet):
     """API endpoint for Indabax settings"""

@@ -1,11 +1,66 @@
+
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import (
     IndabaxSettings, 
     IndabaxEvent, 
     IndabaxSpeaker, 
     IndabaxSession, 
-    IndabaxGallery
+    IndabaxGallery,
+    HeroSection,
+    Leader,
+    LearningResource
 )
+
+# LearningResource admin
+@admin.register(LearningResource)
+class LearningResourceAdmin(admin.ModelAdmin):
+    list_display = ['title', 'resource_type', 'uploaded_by', 'date_added', 'is_published']
+    list_filter = ['resource_type', 'is_published', 'date_added']
+    search_fields = ['title', 'description', 'uploaded_by']
+    list_editable = ['is_published']
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'description', 'resource_type', 'url', 'file', 'uploaded_by', 'is_published')
+        }),
+    )
+
+@admin.register(HeroSection)
+class HeroSectionAdmin(admin.ModelAdmin):
+    list_display = ['title', 'is_active', 'updated_at', 'hero_image_preview']
+    list_editable = ['is_active']
+    readonly_fields = ['hero_image_preview']
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'description', 'image', 'is_active', 'hero_image_preview')
+        }),
+    )
+
+    def hero_image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="max-width:400px; max-height:200px;" />', obj.image.url)
+        return "No image"
+    hero_image_preview.short_description = "Image Preview"
+
+# Leader admin
+@admin.register(Leader)
+class LeaderAdmin(admin.ModelAdmin):
+    list_display = ['name', 'role', 'year', 'is_current', 'leader_image_preview']
+    list_filter = ['year', 'is_current']
+    search_fields = ['name', 'role', 'bio', 'course']
+    list_editable = ['is_current']
+    readonly_fields = ['leader_image_preview']
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'role', 'profile_image', 'leader_image_preview', 'bio', 'course', 'year', 'is_current', 'linkedin', 'twitter', 'github', 'email')
+        }),
+    )
+
+    def leader_image_preview(self, obj):
+        if obj.profile_image:
+            return format_html('<img src="{}" style="max-width:120px; max-height:120px; border-radius:50%;" />', obj.profile_image.url)
+        return "No image"
+    leader_image_preview.short_description = "Profile Preview"
 
 @admin.register(IndabaxSettings)
 class IndabaxSettingsAdmin(admin.ModelAdmin):

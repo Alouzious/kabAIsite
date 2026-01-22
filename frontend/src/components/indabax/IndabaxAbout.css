@@ -1,0 +1,10 @@
+.indabax-about {
+  padding: 2rem;
+  text-align: center;
+}
+.about-img {
+  max-width: 600px;
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 1rem;
+}

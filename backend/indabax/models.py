@@ -1,4 +1,94 @@
 from django.db import models
+
+
+class LearningResource(models.Model):
+    RESOURCE_TYPES = [
+        ('video', 'YouTube Video'),
+        ('doc', 'Google Doc'),
+        ('slide', 'Slides'),
+        ('link', 'Other Link'),
+        ('file', 'File Upload'),
+    ]
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    resource_type = models.CharField(max_length=10, choices=RESOURCE_TYPES, default='link')
+    url = models.URLField(blank=True, help_text="Link to resource (YouTube, Google Doc, etc.)")
+    file = models.FileField(upload_to='indabax/resources/', blank=True, null=True)
+    uploaded_by = models.CharField(max_length=100, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+    is_published = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Learning Resource"
+        verbose_name_plural = "Learning Resources"
+        ordering = ['-date_added']
+
+    def __str__(self):
+        return self.title
+from django.db import models
+from django.core.validators import FileExtensionValidator
+from imagekit.models import ProcessedImageField, ImageSpecField
+from imagekit.processors import ResizeToFill
+class HeroSection(models.Model):
+    """Dynamic hero section for IndabaX"""
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    image = ProcessedImageField(
+        upload_to='indabax/hero/',
+        processors=[ResizeToFill(1200, 600)],
+        format='JPEG',
+        options={'quality': 90},
+        validators=[FileExtensionValidator(['png', 'jpg', 'jpeg', 'webp'])],
+        blank=True,
+        null=True
+    )
+    is_active = models.BooleanField(default=False, help_text="Only one hero can be active.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Hero Section"
+        verbose_name_plural = "Hero Sections"
+
+    def save(self, *args, **kwargs):
+        if self.is_active:
+            HeroSection.objects.filter(is_active=True).update(is_active=False)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+class Leader(models.Model):
+    """Leader profile for IndabaX"""
+    name = models.CharField(max_length=100)
+    role = models.CharField(max_length=100)
+    profile_image = ProcessedImageField(
+        upload_to='indabax/leaders/',
+        processors=[ResizeToFill(400, 400)],
+        format='JPEG',
+        options={'quality': 90},
+        validators=[FileExtensionValidator(['png', 'jpg', 'jpeg', 'webp'])],
+        blank=True,
+        null=True
+    )
+    bio = models.TextField(blank=True)
+    course = models.CharField(max_length=100, blank=True)
+    year = models.PositiveIntegerField()
+    is_current = models.BooleanField(default=False, help_text="Mark as current leader.")
+    linkedin = models.URLField(blank=True)
+    twitter = models.URLField(blank=True)
+    github = models.URLField(blank=True)
+    email = models.EmailField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Leader"
+        verbose_name_plural = "Leaders"
+        ordering = ['-is_current', '-year', 'name']
+
+    def __str__(self):
+        return f"{self.name} ({self.year})"
 from imagekit.models import ProcessedImageField, ImageSpecField
 from imagekit.processors import ResizeToFill, ResizeToFit
 from django.core.validators import FileExtensionValidator

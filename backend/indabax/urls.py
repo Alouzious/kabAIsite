@@ -9,4 +9,10 @@ router.register(r'speakers', views.IndabaxSpeakerViewSet, basename='indabax-spea
 router.register(r'sessions', views.IndabaxSessionViewSet, basename='indabax-session')
 router.register(r'gallery', views.IndabaxGalleryViewSet, basename='indabax-gallery')
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('resources/', views.LearningResourceListView.as_view(), name='indabax-resources-api'),
+    path('', views.indabax_main, name='indabax-main'),
+    path('leaders/', views.indabax_leaders, name='indabax-leaders'),
+    path('hero/', views.HeroSectionListView.as_view(), name='indabax-hero-api'),
+    path('leaders-api/', views.LeaderListView.as_view(), name='indabax-leader-api'),
+] + router.urls

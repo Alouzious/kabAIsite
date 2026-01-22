@@ -1,11 +1,60 @@
+# LearningResource serializer
 from rest_framework import serializers
 from .models import (
+    LearningResource,
     IndabaxSettings,
     IndabaxEvent,
     IndabaxSpeaker,
     IndabaxSession,
-    IndabaxGallery
+    IndabaxGallery,
+    HeroSection,
+    Leader
 )
+
+class LearningResourceSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = LearningResource
+        fields = [
+            'id', 'title', 'description', 'resource_type', 'url', 'file_url', 'uploaded_by', 'date_added', 'is_published'
+        ]
+
+    def get_file_url(self, obj):
+        if obj.file:
+            request = self.context.get('request')
+            return request.build_absolute_uri(obj.file.url) if request else obj.file.url
+        return None
+# HeroSection serializer
+class HeroSectionSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = HeroSection
+        fields = ['id', 'title', 'description', 'image_url', 'is_active', 'created_at', 'updated_at']
+
+    def get_image_url(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            return request.build_absolute_uri(obj.image.url) if request else obj.image.url
+        return None
+
+# Leader serializer
+class LeaderSerializer(serializers.ModelSerializer):
+    profile_image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Leader
+        fields = [
+            'id', 'name', 'role', 'profile_image_url', 'bio', 'course', 'year', 'is_current',
+            'linkedin', 'twitter', 'github', 'email', 'created_at', 'updated_at'
+        ]
+
+    def get_profile_image_url(self, obj):
+        if obj.profile_image:
+            request = self.context.get('request')
+            return request.build_absolute_uri(obj.profile_image.url) if request else obj.profile_image.url
+        return None
 
 class IndabaxSettingsSerializer(serializers.ModelSerializer):
     logo_url = serializers.SerializerMethodField()

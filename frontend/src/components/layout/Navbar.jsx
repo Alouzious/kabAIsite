@@ -418,18 +418,17 @@ const Navbar = ({
               >
                 <a href="#" className="nav-link">Communities</a>
                 
-                {activeDropdown === 'community' && community && community.length > 0 && (
+                {activeDropdown === 'community' && (
                   <div 
                     className="hover-content-panel show"
                     onMouseEnter={() => setActiveDropdown('community')}
                     onMouseLeave={handleMouseLeave}
                   >
                     <ul className="list-unstyled">
-                      {community.map(outreach => (
-                        <li key={outreach.id}>
-                          <Link to="/communities/indabax">{outreach.title}</Link>
-                        </li>
-                      ))}
+                      <li>
+                        <Link to="/communities/indabax">IndabaX</Link>
+                      </li>
+                      {/* Add more hardcoded community links here if needed */}
                     </ul>
                   </div>
                 )}
