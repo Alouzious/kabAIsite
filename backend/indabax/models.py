@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.core.validators import FileExtensionValidator
+from imagekit.models import ProcessedImageField, ImageSpecField
 
 class LearningResource(models.Model):
     RESOURCE_TYPES = [
@@ -14,6 +15,14 @@ class LearningResource(models.Model):
     resource_type = models.CharField(max_length=10, choices=RESOURCE_TYPES, default='link')
     url = models.URLField(blank=True, help_text="Link to resource (YouTube, Google Doc, etc.)")
     file = models.FileField(upload_to='indabax/resources/', blank=True, null=True)
+    image = ProcessedImageField(
+        upload_to='indabax/resources/images/',
+        format='JPEG',
+        options={'quality': 90},  # Optionally increase quality if you want even heavier!
+        blank=True,
+        null=True,
+        help_text="Optional thumbnail/preview image"
+    )
     uploaded_by = models.CharField(max_length=100, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
     is_published = models.BooleanField(default=True)
@@ -25,17 +34,13 @@ class LearningResource(models.Model):
 
     def __str__(self):
         return self.title
-from django.db import models
-from django.core.validators import FileExtensionValidator
-from imagekit.models import ProcessedImageField, ImageSpecField
-from imagekit.processors import ResizeToFill
+
 class HeroSection(models.Model):
     """Dynamic hero section for IndabaX"""
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     image = ProcessedImageField(
         upload_to='indabax/hero/',
-        processors=[ResizeToFill(1200, 600)],
         format='JPEG',
         options={'quality': 90},
         validators=[FileExtensionValidator(['png', 'jpg', 'jpeg', 'webp'])],
@@ -64,7 +69,6 @@ class Leader(models.Model):
     role = models.CharField(max_length=100)
     profile_image = ProcessedImageField(
         upload_to='indabax/leaders/',
-        processors=[ResizeToFill(400, 400)],
         format='JPEG',
         options={'quality': 90},
         validators=[FileExtensionValidator(['png', 'jpg', 'jpeg', 'webp'])],
@@ -89,9 +93,7 @@ class Leader(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.year})"
-from imagekit.models import ProcessedImageField, ImageSpecField
-from imagekit.processors import ResizeToFill, ResizeToFit
-from django.core.validators import FileExtensionValidator
+
 from django.utils.text import slugify
 
 class IndabaxSettings(models.Model):
@@ -100,7 +102,6 @@ class IndabaxSettings(models.Model):
     tagline = models.CharField(max_length=500, blank=True)
     logo = ProcessedImageField(
         upload_to='indabax/logos/',
-        processors=[ResizeToFit(300, 100)],
         format='PNG',
         options={'quality': 90},
         blank=True,
@@ -112,11 +113,24 @@ class IndabaxSettings(models.Model):
     about_description = models.TextField()
     about_image = ProcessedImageField(
         upload_to='indabax/about/',
-        processors=[ResizeToFit(800, 600)],
         format='JPEG',
-        options={'quality':  85},
+        options={'quality': 85},
         blank=True,
         null=True
+    )
+    
+    # Vision & Mission Section
+    vision_title = models.CharField(max_length=200, default="Our Vision", blank=True)
+    vision_description = models.TextField(blank=True)
+    mission_title = models.CharField(max_length=200, default="Our Mission", blank=True)
+    mission_description = models.TextField(blank=True)
+    vision_mission_image = ProcessedImageField(
+        upload_to='indabax/vision_mission/',
+        format='JPEG',
+        options={'quality': 85},
+        blank=True,
+        null=True,
+        help_text="Optional image for Vision & Mission section"
     )
     
     # Contact
@@ -126,13 +140,13 @@ class IndabaxSettings(models.Model):
     
     # Social Media
     facebook_url = models.URLField(blank=True)
-    twitter_url = models. URLField(blank=True)
+    twitter_url = models.URLField(blank=True)
     instagram_url = models.URLField(blank=True)
     linkedin_url = models.URLField(blank=True)
     youtube_url = models.URLField(blank=True)
     
     # Timestamps
-    created_at = models. DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
@@ -157,7 +171,6 @@ class IndabaxEvent(models.Model):
     # Image
     image = ProcessedImageField(
         upload_to='indabax/events/',
-        processors=[ResizeToFill(800, 600)],
         format='JPEG',
         options={'quality': 85},
         validators=[FileExtensionValidator(['png', 'jpg', 'jpeg', 'webp'])]
@@ -171,7 +184,7 @@ class IndabaxEvent(models.Model):
     venue = models.CharField(max_length=200, blank=True)
     
     # Registration
-    registration_url = models. URLField(blank=True)
+    registration_url = models.URLField(blank=True)
     registration_deadline = models.DateField(blank=True, null=True)
     max_participants = models.IntegerField(blank=True, null=True)
     
@@ -206,7 +219,6 @@ class IndabaxSpeaker(models.Model):
     # Photo
     photo = ProcessedImageField(
         upload_to='indabax/speakers/',
-        processors=[ResizeToFill(400, 400)],
         format='JPEG',
         options={'quality': 90},
         validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])]
@@ -228,7 +240,7 @@ class IndabaxSpeaker(models.Model):
     
     # Display
     order = models.IntegerField(default=0)
-    is_active = models. BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
     is_keynote = models.BooleanField(default=False, verbose_name="Keynote Speaker")
     
     # Timestamps
@@ -265,14 +277,14 @@ class IndabaxSession(models.Model):
     )
     speaker = models.ForeignKey(
         IndabaxSpeaker,
-        on_delete=models. SET_NULL,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='sessions'
     )
     date = models.DateField()
     start_time = models.TimeField()
-    end_time = models. TimeField()
+    end_time = models.TimeField()
     room = models.CharField(max_length=100, blank=True)
     
     # Materials
@@ -285,7 +297,7 @@ class IndabaxSession(models.Model):
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models. DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = "Indabax Session"
@@ -297,13 +309,12 @@ class IndabaxSession(models.Model):
 
 class IndabaxGallery(models.Model):
     """Indabax gallery images"""
-    title = models. CharField(max_length=200)
+    title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     
     # Image
     image = ProcessedImageField(
         upload_to='indabax/gallery/',
-        processors=[ResizeToFit(1200, 900)],
         format='JPEG',
         options={'quality': 90},
         validators=[FileExtensionValidator(['png', 'jpg', 'jpeg', 'webp'])]
@@ -311,7 +322,6 @@ class IndabaxGallery(models.Model):
     
     image_thumbnail = ImageSpecField(
         source='image',
-        processors=[ResizeToFill(400, 300)],
         format='JPEG',
         options={'quality':  80}
     )

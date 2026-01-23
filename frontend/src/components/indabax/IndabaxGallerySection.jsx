@@ -6,10 +6,12 @@ const IndabaxGallerySection = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showAll, setShowAll] = useState(false);
+
   useEffect(() => {
-    axios.get('/api/indabax/gallery/')
+    axios.get('/api/indabax/api/gallery/')
       .then(res => {
-        setImages(res.data);
+        setImages(res.data.results); // FIX: Access results array
         setLoading(false);
       })
       .catch(() => {
@@ -18,20 +20,74 @@ const IndabaxGallerySection = () => {
       });
   }, []);
 
-  if (loading) return <div>Loading gallery...</div>;
-  if (error) return <div>{error}</div>;
-  if (!images.length) return <div>No gallery images found.</div>;
+  if (loading) return <div className="gallery-loading">Loading gallery...</div>;
+  if (error) return <div className="gallery-error">{error}</div>;
+  if (!images.length) return <div className="gallery-empty">No gallery images found.</div>;
+
+  const firstFourImages = images.slice(0, 4);
+  const remainingImages = images.slice(4);
+  const hasMoreImages = remainingImages.length > 0;
+
   return (
     <section className="indabax-gallery">
-      <h2>Gallery</h2>
-      <div className="gallery-list">
-        {images.map(img => (
-          <div key={img.id} className="gallery-card">
-            {img.image_url && <img src={img.image_url} alt={img.title} className="gallery-img" />}
-            <h4>{img.title}</h4>
-            <p>{img.description}</p>
+      <div className="container">
+        <h2 className="gallery-title">Gallery</h2>
+        
+        {/* First 4 Images - Always Visible */}
+        <div className="gallery-grid">
+          {firstFourImages.map(img => (
+            <div key={img.id} className="gallery-card">
+              {img.image_thumbnail_url ? (
+                <img src={img.image_thumbnail_url} alt={img.title} className="gallery-img" />
+              ) : img.image_url ? (
+                <img src={img.image_url} alt={img.title} className="gallery-img" />
+              ) : (
+                <div className="gallery-placeholder">No Image</div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Show More Button - Only when not expanded */}
+        {hasMoreImages && !showAll && (
+          <div className="gallery-button-wrapper">
+            <button 
+              className="gallery-toggle-btn"
+              onClick={() => setShowAll(true)}
+            >
+              See More ({remainingImages.length} more)
+            </button>
           </div>
-        ))}
+        )}
+
+        {/* Remaining Images - Show when expanded */}
+        {hasMoreImages && showAll && (
+          <div className="gallery-grid gallery-additional">
+            {remainingImages.map(img => (
+              <div key={img.id} className="gallery-card">
+                {img.image_thumbnail_url ? (
+                  <img src={img.image_thumbnail_url} alt={img.title} className="gallery-img" />
+                ) : img.image_url ? (
+                  <img src={img.image_url} alt={img.title} className="gallery-img" />
+                ) : (
+                  <div className="gallery-placeholder">No Image</div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Hide Button - Only when expanded, below all images */}
+        {hasMoreImages && showAll && (
+          <div className="gallery-button-wrapper">
+            <button 
+              className="gallery-toggle-btn"
+              onClick={() => setShowAll(false)}
+            >
+              Hide
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

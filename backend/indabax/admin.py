@@ -15,15 +15,22 @@ from .models import (
 # LearningResource admin
 @admin.register(LearningResource)
 class LearningResourceAdmin(admin.ModelAdmin):
-    list_display = ['title', 'resource_type', 'uploaded_by', 'date_added', 'is_published']
+    list_display = ['title', 'resource_type', 'uploaded_by', 'date_added', 'is_published', 'resource_image_preview']
     list_filter = ['resource_type', 'is_published', 'date_added']
     search_fields = ['title', 'description', 'uploaded_by']
     list_editable = ['is_published']
+    readonly_fields = ['resource_image_preview']
     fieldsets = (
         (None, {
-            'fields': ('title', 'description', 'resource_type', 'url', 'file', 'uploaded_by', 'is_published')
+            'fields': ('title', 'description', 'resource_type', 'url', 'file', 'image', 'resource_image_preview', 'uploaded_by', 'is_published')
         }),
     )
+    
+    def resource_image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="max-width:300px; max-height:200px; border-radius:8px;" />', obj.image.url)
+        return "No image"
+    resource_image_preview.short_description = "Image Preview"
 
 @admin.register(HeroSection)
 class HeroSectionAdmin(admin.ModelAdmin):
@@ -67,16 +74,23 @@ class IndabaxSettingsAdmin(admin.ModelAdmin):
     list_display = ['site_name', 'contact_email', 'updated_at']
     fieldsets = (
         ('Basic Information', {
-            'fields':  ('site_name', 'tagline', 'logo')
+            'fields': ('site_name', 'tagline', 'logo')
         }),
         ('About Section', {
             'fields': ('about_title', 'about_description', 'about_image')
+        }),
+        ('Vision & Mission', {
+            'fields': ('vision_title', 'vision_description', 
+                      'mission_title', 'mission_description', 
+                      'vision_mission_image'),
+            'classes': ('collapse',),
+            'description': 'Optional: Add your organization\'s vision and mission statements'
         }),
         ('Contact Information', {
             'fields': ('contact_email', 'contact_phone', 'location')
         }),
         ('Social Media', {
-            'fields':  ('facebook_url', 'twitter_url', 'instagram_url', 
+            'fields': ('facebook_url', 'twitter_url', 'instagram_url', 
                       'linkedin_url', 'youtube_url'),
             'classes': ('collapse',)
         }),

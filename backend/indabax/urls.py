@@ -15,4 +15,5 @@ urlpatterns = [
     path('leaders/', views.indabax_leaders, name='indabax-leaders'),
     path('hero/', views.HeroSectionListView.as_view(), name='indabax-hero-api'),
     path('leaders-api/', views.LeaderListView.as_view(), name='indabax-leader-api'),
-] + router.urls
+    path('api/', include(router.urls)),  # This makes settings/current/ work
+]

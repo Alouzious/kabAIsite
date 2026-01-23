@@ -11,21 +11,6 @@ from .models import (
     Leader
 )
 
-class LearningResourceSerializer(serializers.ModelSerializer):
-    file_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = LearningResource
-        fields = [
-            'id', 'title', 'description', 'resource_type', 'url', 'file_url', 'uploaded_by', 'date_added', 'is_published'
-        ]
-
-    def get_file_url(self, obj):
-        if obj.file:
-            request = self.context.get('request')
-            return request.build_absolute_uri(obj.file.url) if request else obj.file.url
-        return None
-# HeroSection serializer
 class HeroSectionSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
 
@@ -33,6 +18,29 @@ class HeroSectionSerializer(serializers.ModelSerializer):
         model = HeroSection
         fields = ['id', 'title', 'description', 'image_url', 'is_active', 'created_at', 'updated_at']
 
+    def get_image_url(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            return request.build_absolute_uri(obj.image.url) if request else obj.image.url
+        return None
+
+class LearningResourceSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = LearningResource
+        fields = [
+            'id', 'title', 'description', 'resource_type', 'url', 'file_url', 
+            'image_url', 'uploaded_by', 'date_added', 'is_published'
+        ]
+
+    def get_file_url(self, obj):
+        if obj.file:
+            request = self.context.get('request')
+            return request.build_absolute_uri(obj.file.url) if request else obj.file.url
+        return None
+    
     def get_image_url(self, obj):
         if obj.image:
             request = self.context.get('request')
@@ -59,6 +67,7 @@ class LeaderSerializer(serializers.ModelSerializer):
 class IndabaxSettingsSerializer(serializers.ModelSerializer):
     logo_url = serializers.SerializerMethodField()
     about_image_url = serializers.SerializerMethodField()
+    vision_mission_image_url = serializers.SerializerMethodField()
     
     class Meta:
         model = IndabaxSettings
@@ -73,7 +82,13 @@ class IndabaxSettingsSerializer(serializers.ModelSerializer):
     def get_about_image_url(self, obj):
         if obj.about_image:
             request = self.context.get('request')
-            return request.build_absolute_uri(obj.about_image.url) if request else obj. about_image.url
+            return request.build_absolute_uri(obj.about_image.url) if request else obj.about_image.url
+        return None
+    
+    def get_vision_mission_image_url(self, obj):
+        if obj.vision_mission_image:
+            request = self.context.get('request')
+            return request.build_absolute_uri(obj.vision_mission_image.url) if request else obj.vision_mission_image.url
         return None
 
 class IndabaxEventSerializer(serializers.ModelSerializer):

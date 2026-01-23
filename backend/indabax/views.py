@@ -27,6 +27,7 @@ from .serializers import (
     IndabaxGallerySerializer,
     HeroSectionSerializer,
     LeaderSerializer
+    
 )
 # IndabaX main page view
 from django.views.generic import TemplateView

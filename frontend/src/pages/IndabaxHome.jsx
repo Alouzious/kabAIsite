@@ -1,5 +1,8 @@
 import React from 'react';
 import IndabaxNavbar from '../components/indabax/IndabaxNavbar';
+import '../components/indabax/IndabaxNavbar.css';
+import IndabaxFooter from '../components/layout/IndabaxFooter';
+import '../components/layout/IndabaxFooter.css';
 import HeroSection from '../components/indabax/HeroSection';
 import LeadersSection from '../components/indabax/LeadersSection';
 import IndabaxGallerySection from '../components/indabax/IndabaxGallerySection';
@@ -13,10 +16,12 @@ const IndabaxHome = () => (
 	<div>
 		<IndabaxNavbar />
 		<HeroSection />
+		<IndabaxAboutSection />
 		<LeadersSection />
 		<IndabaxGallerySection />
 		<LearningResourcesSection />
-		<IndabaxAboutSection />
+		
+		<IndabaxFooter />
 	</div>
 );
 
