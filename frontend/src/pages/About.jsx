@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SEO from '../components/layout/SEO';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
@@ -156,149 +157,152 @@ const About = () => {
   }
 
   const about = aboutData;
+  const siteName = process.env.REACT_APP_SITE_NAME || 'KUAI Club';
+  const siteDescription = process.env.REACT_APP_SITE_DESCRIPTION || 'Kabale University AI Club - Empowering the next generation of AI leaders in Uganda.';
+  const siteKeywords = process.env.REACT_APP_SITE_KEYWORDS || 'AI, Artificial Intelligence, Uganda, Kabale University, Machine Learning, Data Science, Indabax, Research, Events, News';
+  const siteUrl = process.env.REACT_APP_SITE_URL || 'http://localhost:3000/about';
 
   return (
-    <div className="about-page">
-      <Navbar siteSettings={siteSettings} />
-
-      {/* Hero Section */}
-      <div className="about-hero">
-        <div className="container">
-          <div className="hero-content">
-            <h1>{about.title}</h1>
-            <p className="hero-subtitle">{about.content}</p>
-            <div className="hero-stats">
-              <div className="hero-stat">
-                <span className="hero-stat-number">{about.hero_stat_1_value}</span>
-                <span className="hero-stat-label">{about.hero_stat_1_label}</span>
-              </div>
-              <div className="hero-stat">
-                <span className="hero-stat-number">{about.hero_stat_2_value}</span>
-                <span className="hero-stat-label">{about. hero_stat_2_label}</span>
-              </div>
-              <div className="hero-stat">
-                <span className="hero-stat-number">{about. hero_stat_3_value}</span>
-                <span className="hero-stat-label">{about.hero_stat_3_label}</span>
-              </div>
-              <div className="hero-stat">
-                <span className="hero-stat-number">{about.hero_stat_4_value}</span>
-                <span className="hero-stat-label">{about.hero_stat_4_label}</span>
+    <>
+      <SEO
+        title={siteName + ' | About'}
+        description={siteDescription}
+        keywords={siteKeywords}
+        canonical={siteUrl + '/about'}
+      />
+      <div className="about-page">
+        <Navbar siteSettings={siteSettings} />
+        {/* Hero Section */}
+        <div className="about-hero">
+          <div className="container">
+            <div className="hero-content">
+              <h1>{about.title}</h1>
+              <p className="hero-subtitle">{about.content}</p>
+              <div className="hero-stats">
+                <div className="hero-stat">
+                  <span className="hero-stat-number">{about.hero_stat_1_value}</span>
+                  <span className="hero-stat-label">{about.hero_stat_1_label}</span>
+                </div>
+                <div className="hero-stat">
+                  <span className="hero-stat-number">{about.hero_stat_2_value}</span>
+                  <span className="hero-stat-label">{about. hero_stat_2_label}</span>
+                </div>
+                <div className="hero-stat">
+                  <span className="hero-stat-number">{about. hero_stat_3_value}</span>
+                  <span className="hero-stat-label">{about.hero_stat_3_label}</span>
+                </div>
+                <div className="hero-stat">
+                  <span className="hero-stat-number">{about.hero_stat_4_value}</span>
+                  <span className="hero-stat-label">{about.hero_stat_4_label}</span>
+                </div>
               </div>
             </div>
+            <div className="scroll-indicator"></div>
           </div>
-          <div className="scroll-indicator"></div>
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="about-content">
-        <div className="container">
-          {/* Who We Are & Why We Exist */}
-          <div className="dual-section" id="who-we-are">
-            {/* Who We Are */}
-            <div className="section-card">
-              <h2>{about.who_we_are_title}</h2>
-              <p>{about. who_we_are_description}</p>
-              {about.who_we_are_image && (
-                <div className="section-image">
-                  <img src={about.who_we_are_image} alt={about.who_we_are_title} loading="lazy" />
-                </div>
-              )}
-            </div>
-
-            {/* Why We Exist */}
-            <div className="section-card">
-              <h2>{about.why_exist_title}</h2>
-              <p>{about.why_exist_description}</p>
-              {about.image && (
-                <div className="section-image">
-                  <img src={about. image} alt={about.why_exist_title} loading="lazy" />
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Mission, Vision, Objectives */}
-          <div className="foundation-section">
-            <div className="section-header">
-              <h2 className="section-title">Our Foundation</h2>
-              <p className="section-subtitle">
-                The core principles that drive everything we do at KUAI Club
-              </p>
-            </div>
-
-            <div className="mvv-grid" id="mission">
-              {/* Mission */}
-              <div className="mvv-card">
-                <div className="mvv-icon">
-                  <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <h3>Our Mission</h3>
-                <p>{about.mission}</p>
+        {/* Main Content */}
+        <div className="about-content">
+          <div className="container">
+            {/* Who We Are & Why We Exist */}
+            <div className="dual-section" id="who-we-are">
+              {/* Who We Are */}
+              <div className="section-card">
+                <h2>{about.who_we_are_title}</h2>
+                <p>{about. who_we_are_description}</p>
+                {about.who_we_are_image && (
+                  <div className="section-image">
+                    <img src={about.who_we_are_image} alt={about.who_we_are_title} loading="lazy" />
+                  </div>
+                )}
               </div>
-
-              {/* Vision */}
-              <div className="mvv-card" id="vision">
-                <div className="mvv-icon">
-                  <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                    <path fillRule="evenodd" d="M. 458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <h3>Our Vision</h3>
-                <p>{about.vision}</p>
+              {/* Why We Exist */}
+              <div className="section-card">
+                <h2>{about.why_exist_title}</h2>
+                <p>{about.why_exist_description}</p>
+                {about.image && (
+                  <div className="section-image">
+                    <img src={about. image} alt={about.why_exist_title} loading="lazy" />
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-
-          {/* Impact Section */}
-          <div className="impact-section" id="impact">
-            <div className="container">
+            {/* Mission, Vision, Objectives */}
+            <div className="foundation-section">
               <div className="section-header">
-                <h2 className="section-title" style={{ color: '#2c3e50' }}>Our Impact</h2>
-                <p className="section-subtitle">{about.impact_subtitle}</p>
+                <h2 className="section-title">Our Foundation</h2>
+                <p className="section-subtitle">
+                  The core principles that drive everything we do at KUAI Club
+                </p>
               </div>
-              <div className="stats-grid">
-                <div className="stat-item">
-                  <span className="stat-number">{about.impact_stat_1_value}</span>
-                  <div className="stat-label">{about.impact_stat_1_label}</div>
+              <div className="mvv-grid" id="mission">
+                {/* Mission */}
+                <div className="mvv-card">
+                  <div className="mvv-icon">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <h3>Our Mission</h3>
+                  <p>{about.mission}</p>
                 </div>
-                <div className="stat-item">
-                  <span className="stat-number">{about.impact_stat_2_value}</span>
-                  <div className="stat-label">{about.impact_stat_2_label}</div>
+                {/* Vision */}
+                <div className="mvv-card" id="vision">
+                  <div className="mvv-icon">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                      <path fillRule="evenodd" d="M. 458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <h3>Our Vision</h3>
+                  <p>{about.vision}</p>
                 </div>
-                <div className="stat-item">
-                  <span className="stat-number">{about.impact_stat_3_value}</span>
-                  <div className="stat-label">{about.impact_stat_3_label}</div>
+              </div>
+            </div>
+            {/* Impact Section */}
+            <div className="impact-section" id="impact">
+              <div className="container">
+                <div className="section-header">
+                  <h2 className="section-title" style={{ color: '#2c3e50' }}>Our Impact</h2>
+                  <p className="section-subtitle">{about.impact_subtitle}</p>
                 </div>
-                <div className="stat-item">
-                  <span className="stat-number">{about. impact_stat_4_value}</span>
-                  <div className="stat-label">{about. impact_stat_4_label}</div>
+                <div className="stats-grid">
+                  <div className="stat-item">
+                    <span className="stat-number">{about.impact_stat_1_value}</span>
+                    <div className="stat-label">{about.impact_stat_1_label}</div>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-number">{about.impact_stat_2_value}</span>
+                    <div className="stat-label">{about.impact_stat_2_label}</div>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-number">{about.impact_stat_3_value}</span>
+                    <div className="stat-label">{about.impact_stat_3_label}</div>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-number">{about. impact_stat_4_value}</span>
+                    <div className="stat-label">{about. impact_stat_4_label}</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Call to Action */}
-      <div className="cta-section">
-        <div className="container">
-          <div className="cta-content">
-            <h2 className="cta-title">{about.cta_title}</h2>
-            <p className="cta-description">{about.cta_description}</p>
-            <div className="cta-buttons">
-              <a href={about.cta_primary_link} className="btn-primary">{about.cta_primary_text}</a>
-              <a href={about. cta_secondary_link} className="btn-secondary">{about. cta_secondary_text}</a>
+        {/* Call to Action */}
+        <div className="cta-section">
+          <div className="container">
+            <div className="cta-content">
+              <h2 className="cta-title">{about.cta_title}</h2>
+              <p className="cta-description">{about.cta_description}</p>
+              <div className="cta-buttons">
+                <a href={about.cta_primary_link} className="btn-primary">{about.cta_primary_text}</a>
+                <a href={about. cta_secondary_link} className="btn-secondary">{about. cta_secondary_text}</a>
+              </div>
             </div>
           </div>
         </div>
+        <Footer siteSettings={siteSettings} contactInfo={contactInfo} />
       </div>
-
-      <Footer siteSettings={siteSettings} contactInfo={contactInfo} />
-    </div>
+    </>
   );
 };
 

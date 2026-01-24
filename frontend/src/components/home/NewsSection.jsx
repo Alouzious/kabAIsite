@@ -19,21 +19,19 @@ const NewsSection = ({ initialNews = [] }) => {
 
   const fetchNews = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/news/`);
+      const response = await fetch(`/api/news/articles/`);
       const data = await response.json();
-      setNews(data);
+      setNews(data.results || []);
     } catch (error) {
       console.error('Error fetching news:', error);
     }
   };
 
-  // Auto-play functionality
   useEffect(() => {
     startAutoPlay();
     return () => pauseAutoPlay();
   }, [currentSlide]);
 
-  // Scroll to anchor on page load
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
@@ -46,7 +44,6 @@ const NewsSection = ({ initialNews = [] }) => {
     }
   }, []);
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowLeft') prevSlide();
@@ -57,7 +54,6 @@ const NewsSection = ({ initialNews = [] }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [currentSlide, isTransitioning]);
 
-  // Touch/swipe support
   useEffect(() => {
     let startX = 0;
     let endX = 0;
@@ -120,7 +116,7 @@ const NewsSection = ({ initialNews = [] }) => {
   const startAutoPlay = () => {
     pauseAutoPlay();
     if (totalSlides > 1) {
-      autoPlayInterval. current = setInterval(() => {
+      autoPlayInterval.current = setInterval(() => {
         nextSlide();
       }, 5000);
     }
@@ -140,13 +136,17 @@ const NewsSection = ({ initialNews = [] }) => {
     return 'news-card';
   };
 
+  // Show date as "Month day, Year" if possible, else raw string
   const formatDate = (dateString) => {
+    if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    return isNaN(date)
+      ? dateString
+      : date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
   };
 
   const truncateText = (text, maxLength) => {
@@ -174,26 +174,24 @@ const NewsSection = ({ initialNews = [] }) => {
       onMouseEnter={pauseAutoPlay}
       onMouseLeave={startAutoPlay}
     >
-      {/* Background Slider - Use card image as background */}
+      {/* Background Slider */}
       <div className="news-background-slider">
         {news.map((item, index) => (
           <div
             key={`bg-${item.id}`}
             className={`news-background-slide ${index === currentSlide ? 'active' : ''}`}
-            style={{ backgroundImage: `url(${item.image})` }}
+            style={{ backgroundImage: `url(${item.image_thumbnail_url})` }}
           />
         ))}
       </div>
 
       {/* Content Overlay */}
       <div className="news-content-overlay">
-        {/* Heading */}
         <div className="news-heading">
           <h2>Latest News & Updates</h2>
           <p>Stay updated with the most recent announcements and highlights</p>
         </div>
 
-        {/* News Slider Container */}
         <div className="news-slider-container">
           {news.map((item, index) => (
             <div
@@ -202,19 +200,19 @@ const NewsSection = ({ initialNews = [] }) => {
               className="news-card-wrapper"
             >
               <div className={getCardClass(index)}>
-                {item.image && (
+                {item.image_thumbnail_url && (
                   <img 
-                    src={item.image} 
+                    src={item.image_thumbnail_url}
                     alt={item.title} 
                     loading="lazy"
                   />
                 )}
                 <div className="news-text">
                   <h3>{item.title}</h3>
-                  <p>{truncateText(item.summary, 150)}</p>
+                  <p>{truncateText(item.excerpt, 150)}</p>
                   <div className="news-meta">
                     <span className="news-date">
-                      {formatDate(item.publish_date)}
+                      {formatDate(item.date)}
                     </span>
                   </div>
                 </div>

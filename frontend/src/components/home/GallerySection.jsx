@@ -1,46 +1,46 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './GallerySection.css';
 
-const GallerySection = ({ initialGallery = [] }) => {
-  const [gallery, setGallery] = useState(initialGallery);
+const GallerySection = () => {
+  const [gallery, setGallery] = useState([]);
   const [showExtra, setShowExtra] = useState(false);
   const [loadedImages, setLoadedImages] = useState(new Set());
   const extraGalleryRef = useRef(null);
   const mainGalleryRef = useRef(null);
 
-  // Fetch gallery from API
+  // Fetch gallery images from API (images only)
   useEffect(() => {
-    if (initialGallery. length === 0) {
-      fetchGallery();
-    }
-  }, []);
+    const fetchGallery = async () => {
+      try {
+        // Your correct images endpoint for DRF router is usually /api/gallery/images/
+        const response = await fetch('/api/gallery/images/');
+        const data = await response.json();
+        // support paginated (results) or flat
+        setGallery(data.results || data || []);
+      } catch (error) {
+        console.error('Error fetching gallery:', error);
+      }
+    };
 
-  const fetchGallery = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/gallery/`);
-      const data = await response.json();
-      setGallery(data);
-    } catch (error) {
-      console.error('Error fetching gallery:', error);
-    }
-  };
+    fetchGallery();
+  }, []);
 
   // Intersection Observer for fade-in animation
   useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
-      rootMargin:  '0px 0px -50px 0px'
+      rootMargin: '0px 0px -50px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
+          entry.target.classList.add('gallery-showcase-visible');
         }
       });
     }, observerOptions);
 
-    const items = document.querySelectorAll('.gallery-item');
+    const items = document.querySelectorAll('.gallery-showcase-item');
     items.forEach(item => observer.observe(item));
 
     return () => observer.disconnect();
@@ -49,7 +49,7 @@ const GallerySection = ({ initialGallery = [] }) => {
   const handleShowMore = () => {
     setShowExtra(true);
     setTimeout(() => {
-      extraGalleryRef. current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      extraGalleryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
   };
 
@@ -69,14 +69,14 @@ const GallerySection = ({ initialGallery = [] }) => {
   };
 
   const mainImages = gallery.slice(0, 4);
-  const extraImages = gallery. slice(4);
+  const extraImages = gallery.slice(4);
   const hasMore = gallery.length > 4;
 
   if (gallery.length === 0) {
     return (
-      <section className="gallery-section">
-        <h2 className="gallery-title">Latest Gallery</h2>
-        <div className="gallery-no-data">
+      <section className="gallery-showcase-section">
+        <h2 className="gallery-showcase-title">Latest Gallery</h2>
+        <div className="gallery-showcase-no-data">
           <p>No images available in the gallery yet.</p>
         </div>
       </section>
@@ -84,20 +84,20 @@ const GallerySection = ({ initialGallery = [] }) => {
   }
 
   return (
-    <section id="gallery-section" className="gallery-section">
-      <h2 className="gallery-title">Latest Gallery</h2>
+    <section id="gallery-showcase-section" className="gallery-showcase-section">
+      <h2 className="gallery-showcase-title">Latest Gallery</h2>
 
-      {/* Main Gallery */}
-      <div id="main-gallery" className="gallery-wrapper" ref={mainGalleryRef}>
+      {/* Main Gallery (First 4 images only) */}
+      <div id="gallery-showcase-main" className="gallery-showcase-wrapper" ref={mainGalleryRef}>
         {mainImages.map((image) => (
           <div
             key={image.id}
-            className={`gallery-item ${!loadedImages.has(image. id) ? 'loading' : ''}`}
-            onClick={() => handleImageClick(image.image)}
+            className={`gallery-showcase-item ${!loadedImages.has(image.id) ? 'gallery-showcase-loading' : ''}`}
+            onClick={() => handleImageClick(image.image_url || image.image)}
           >
             <img
-              src={image.image}
-              alt={image.title || 'Gallery image'}
+              src={image.image_url || image.image}
+              alt=""
               loading="lazy"
               onLoad={() => handleImageLoad(image.id)}
               onError={() => handleImageLoad(image.id)}
@@ -106,14 +106,14 @@ const GallerySection = ({ initialGallery = [] }) => {
         ))}
 
         {/* Show More Button */}
-        {hasMore && ! showExtra && (
-          <div className="more-btn-container">
+        {hasMore && !showExtra && (
+          <div className="gallery-showcase-more-btn-container">
             <button
-              id="show-more-btn"
-              className="gallery-btn gallery-btn-primary small-btn"
+              id="gallery-showcase-show-more-btn"
+              className="gallery-showcase-btn gallery-showcase-small-btn"
               onClick={handleShowMore}
               aria-expanded={showExtra}
-              aria-controls="extra-gallery"
+              aria-controls="gallery-showcase-extra"
             >
               + More
             </button>
@@ -121,23 +121,23 @@ const GallerySection = ({ initialGallery = [] }) => {
         )}
       </div>
 
-      {/* Extra Gallery */}
+      {/* Extra Gallery (Rest) */}
       {hasMore && showExtra && (
         <div
-          id="extra-gallery"
-          className={`gallery-wrapper extra-gallery ${showExtra ? 'show' : ''}`}
+          id="gallery-showcase-extra"
+          className={`gallery-showcase-wrapper gallery-showcase-extra${showExtra ? ' gallery-showcase-show' : ''}`}
           ref={extraGalleryRef}
-          aria-hidden={! showExtra}
+          aria-hidden={!showExtra}
         >
           {extraImages.map((image) => (
             <div
               key={image.id}
-              className={`gallery-item ${!loadedImages.has(image. id) ? 'loading' : ''}`}
-              onClick={() => handleImageClick(image.image)}
+              className={`gallery-showcase-item ${!loadedImages.has(image.id) ? 'gallery-showcase-loading' : ''}`}
+              onClick={() => handleImageClick(image.image_url || image.image)}
             >
               <img
-                src={image.image}
-                alt={image.title || 'Gallery image'}
+                src={image.image_url || image.image}
+                alt=""
                 loading="lazy"
                 onLoad={() => handleImageLoad(image.id)}
                 onError={() => handleImageLoad(image.id)}
@@ -145,11 +145,11 @@ const GallerySection = ({ initialGallery = [] }) => {
             </div>
           ))}
 
-          {/* Hide Button */}
-          <div className="hide-btn-container">
+          {/* Hide Button - Now at the end after all images */}
+          <div className="gallery-showcase-hide-btn-container">
             <button
-              id="hide-gallery-btn"
-              className="gallery-btn gallery-btn-secondary hide-btn small-btn"
+              id="gallery-showcase-hide-btn"
+              className="gallery-showcase-btn gallery-showcase-secondary gallery-showcase-small-btn"
               onClick={handleHide}
             >
               Hide

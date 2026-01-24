@@ -9,18 +9,18 @@
   overflow: hidden;
 }
 
-.partners-section:: before {
+.partners-section::before {
   content: '';
   position: absolute;
   top: 0;
-  left:  0;
+  left: 0;
   right: 0;
   bottom: 0;
   background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23000000" fill-opacity="0.02"><circle cx="30" cy="30" r="2"/></g></g></svg>') repeat;
   pointer-events: none;
 }
 
-.partners-section . container {
+.partners-section .container {
   position: relative;
   z-index: 1;
   max-width: 1200px;
@@ -32,13 +32,13 @@
 .partners-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color:  #2c3e50;
+  color: #2c3e50;
   margin-bottom: 3rem;
   position: relative;
   text-align: center;
 }
 
-. partners-title::after {
+.partners-title::after {
   content: '';
   position: absolute;
   bottom: -10px;
@@ -89,12 +89,12 @@
   transition: transform 0.4s ease;
 }
 
-. partner-card:hover::before {
+.partner-card:hover::before {
   transform: scaleX(1);
 }
 
 .partner-card:hover {
-  transform:  translateY(-10px) scale(1.02);
+  transform: translateY(-10px) scale(1.02);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
@@ -108,7 +108,7 @@
   max-height: 120px;
   width: 100%;
   object-fit: contain;
-  transition:  transform 0.3s ease;
+  transition: transform 0.3s ease;
   padding: 20px;
 }
 
@@ -140,7 +140,7 @@
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 500;
-  display:  inline-block;
+  display: inline-block;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   align-self: center;
@@ -150,7 +150,7 @@
   color: #6c757d;
   font-size: 0.9rem;
   line-height: 1.5;
-  margin:  0;
+  margin: 0;
 }
 
 /* Website Link */
@@ -175,7 +175,7 @@
   background: #007bff;
   color: white;
   transform: translateX(5px);
-  text-decoration:  none;
+  text-decoration: none;
 }
 
 .partner-website-link i {
@@ -202,9 +202,11 @@
 /* Loading State */
 .partners-loading {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 200px;
+  min-height: 200px;
+  gap: 1rem;
 }
 
 .partners-spinner {
@@ -213,7 +215,7 @@
   border: 4px solid #f3f3f3;
   border-top: 4px solid #007bff;
   border-radius: 50%;
-  animation: partnersspin 1s linear infinite;
+  animation: partnerspin 1s linear infinite;
 }
 
 @keyframes partnerspin {
@@ -228,7 +230,7 @@
 /* No Data State */
 .partners-no-data {
   grid-column: 1 / -1;
-  text-align:  center;
+  text-align: center;
   padding: 60px 20px;
   color: #6c757d;
   font-size: 1.1rem;

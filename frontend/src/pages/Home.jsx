@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import SEO from '../components/layout/SEO';
 import Navbar from '../components/layout/Navbar';
 import HeroSlider from '../components/home/HeroSlider';
 import ProjectsSection from '../components/home/ProjectsSection';
@@ -8,30 +10,25 @@ import NewsSection from '../components/home/NewsSection';
 import GallerySection from '../components/home/GallerySection';
 import Footer from '../components/layout/Footer';
 import PartnersSection from '../components/home/PartnersSection';
-import { samplePartners } from '../data/sampleData';
-import { 
-  sampleSiteSettings, 
-  sampleHeroSlides, 
-  sampleProjects,
-  sampleEvents,
-  sampleLeaders,
-  sampleLeaderCategories,
-  sampleNews,
-  sampleGallery,
-  sampleContactInfo 
-} from '../data/sampleData';
+
 import './Home.css';
 
+const siteName = process.env.REACT_APP_SITE_NAME || 'KUAI Club';
+const siteDescription =
+  process.env.REACT_APP_SITE_DESCRIPTION ||
+  'Kabale University AI Club - Empowering the next generation of AI leaders in Uganda.';
+const siteKeywords =
+  process.env.REACT_APP_SITE_KEYWORDS ||
+  'AI, Artificial Intelligence, Uganda, Kabale University, Machine Learning, Data Science';
+const siteUrl = process.env.REACT_APP_SITE_URL || 'http://localhost:3000';
+
 const Home = () => {
-  // State for data that will come from Django API
   const [siteSettings, setSiteSettings] = useState({});
-  const [heroSlides, setHeroSlides] = useState([]);
   const [aboutPages, setAboutPages] = useState([]);
   const [news, setNews] = useState([]);
   const [events, setEvents] = useState([]);
   const [leaders, setLeaders] = useState([]);
   const [gallery, setGallery] = useState([]);
-  const [partners, setPartners] = useState([]);
   const [research, setResearch] = useState([]);
   const [resources, setResources] = useState([]);
   const [community, setCommunity] = useState([]);
@@ -39,33 +36,55 @@ const Home = () => {
   const [contactInfo, setContactInfo] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Fetch data from Django API when component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // TODO:  Replace with actual API calls when Django backend is ready
-        // Example: 
-        // const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/site-settings/`);
-        // const data = await response. json();
-        // setSiteSettings(data);
+        // Site settings
+        const siteSettingsRes = await axios.get('/api/core/site-settings/');
+        setSiteSettings(Array.isArray(siteSettingsRes.data) ? siteSettingsRes.data[0] : siteSettingsRes.data || {});
 
-        // For now, using sample data to see UI immediately
-        setSiteSettings(sampleSiteSettings);
-        setHeroSlides(sampleHeroSlides);
-        setProjects(sampleProjects);
-        setEvents(sampleEvents);
-        setLeaders(sampleLeaders);
-        setNews(sampleNews);
-        setGallery(sampleGallery);
-        setPartners(samplePartners);
-        setContactInfo(sampleContactInfo);
+        // Contact Info
+        const contactInfoRes = await axios.get('/api/core/contact-info/');
+        setContactInfo(Array.isArray(contactInfoRes.data) ? contactInfoRes.data[0] : contactInfoRes.data || {});
 
-        // Simulate loading delay
-        setTimeout(() => {
-          setLoading(false);
-        }, 500);
+        // About pages (if you have such an endpoint)
+        const aboutPagesRes = await axios.get('/api/about/');
+        setAboutPages(aboutPagesRes.data.results || aboutPagesRes.data || []);
+
+        // News
+        const newsRes = await axios.get('/api/news/articles/');
+        setNews(newsRes.data.results || newsRes.data || []);
+
+        // Events
+        const eventsRes = await axios.get('/api/events/');
+        setEvents(eventsRes.data.results || eventsRes.data || []);
+
+        // Team leaders
+        const leadersRes = await axios.get('/api/team/members/');
+        setLeaders(leadersRes.data.results || leadersRes.data || []);
+
+        // Research
+        const researchRes = await axios.get('/api/research/');
+        setResearch(researchRes.data.results || researchRes.data || []);
+
+        // Resources
+        const resourcesRes = await axios.get('/api/resources/');
+        setResources(resourcesRes.data.results || resourcesRes.data || []);
+
+        // Community
+        const communityRes = await axios.get('/api/community/');
+        setCommunity(communityRes.data.results || communityRes.data || []);
+
+        // Projects
+        const projectsRes = await axios.get('/api/projects/');
+        setProjects(projectsRes.data.results || projectsRes.data || []);
+
+        // Gallery
+        const galleryRes = await axios.get('/api/gallery/images/');
+        setGallery(galleryRes.data.results || galleryRes.data || []);
+
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching data:', error);
         setLoading(false);
       }
     };
@@ -84,47 +103,34 @@ const Home = () => {
   }
 
   return (
-    <div className="home-page">
-      <Navbar 
-        siteSettings={siteSettings}
-        aboutPages={aboutPages}
-        news={news}
-        events={events}
-        research={research}
-        resources={resources}
-        community={community}
-        projects={projects}
+    <>
+      <SEO
+        title={`${siteName} | Home`}
+        description={siteDescription}
+        keywords={siteKeywords}
+        canonical={siteUrl}
       />
-      
-      <HeroSlider heroSlides={heroSlides} />
-      
-      <ProjectsSection initialProjects={projects} />
-      
-      <EventsSection 
-        initialPastEvents={events. filter(e => e.type === 'past')}
-        initialUpcomingEvents={events.filter(e => e.type === 'upcoming')}
-        backgroundImage="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200"
-      />
-      
-      <TeamSection 
-        initialLeaders={leaders}
-        categories={sampleLeaderCategories}
-      />
-      
-      <NewsSection initialNews={news} />
-      
-      <GallerySection initialGallery={gallery} />
-      
-      {/* Add other sections here as you convert them */}
-      {/* <PartnersSection partners={partners} /> */}
-      {/* <ContactSection /> */}
-      <PartnersSection initialPartners={partners} />
-      
-      <Footer 
-        siteSettings={siteSettings} 
-        contactInfo={contactInfo} 
-      />
-    </div>
+
+      <div className="home-page">
+        <Navbar />
+
+        <HeroSlider />
+
+        <ProjectsSection />
+
+        <EventsSection
+          initialPastEvents={events.filter(e => e.type === 'past')}
+          initialUpcomingEvents={events.filter(e => e.type === 'upcoming')}
+          backgroundImage="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200"
+        />
+
+        <TeamSection initialLeaders={leaders} />
+        <NewsSection initialNews={news} />
+        <GallerySection initialGallery={gallery} />
+        <PartnersSection />
+        <Footer siteSettings={siteSettings} contactInfo={contactInfo} />
+      </div>
+    </>
   );
 };
 

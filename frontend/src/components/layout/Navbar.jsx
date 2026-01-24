@@ -2,64 +2,101 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Navbar.css';
 
-const Navbar = ({ 
-  siteSettings = {}, 
-  aboutPages = [], 
-  news = [], 
-  events = [], 
-  research = [], 
-  resources = [], 
-  community = [], 
-  projects = [] 
-}) => {
+const Navbar = () => {
   const location = useLocation();
+
+  // States for fetched site data
+  const [siteSettings, setSiteSettings] = useState({});
+  const [aboutPages, setAboutPages] = useState([]);
+  const [news, setNews] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [research, setResearch] = useState([]);
+  const [resources, setResources] = useState([]);
+  const [community, setCommunity] = useState([]);
+  const [projects, setProjects] = useState([]);
+  
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Handle scroll effect
+  // Fetch all data on mount (like other sections)
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
+    fetch('/api/core/site-settings/')
+      .then(res => res.json())
+      .then(data => {
+        console.log('Site settings response:', data); // Debug log
+        
+        // Handle paginated response with results array
+        if (data.results && Array.isArray(data.results) && data.results.length > 0) {
+          setSiteSettings(data.results[0]);
+        } 
+        // Handle direct array response
+        else if (Array.isArray(data) && data.length > 0) {
+          setSiteSettings(data[0]);
+        } 
+        // Handle single object response
+        else if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+          setSiteSettings(data);
+        } 
+        // Fallback to empty object
+        else {
+          setSiteSettings({});
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching site settings:', error);
+        setSiteSettings({});
+      });
 
+    fetch('/api/about/')
+      .then(res => res.json())
+      .then(data => setAboutPages(data.results || data || []));
+    fetch('/api/news/articles/')
+      .then(res => res.json())
+      .then(data => setNews(data.results || []));
+    fetch('/api/events/')
+      .then(res => res.json())
+      .then(data => setEvents(data.results || []));
+    fetch('/api/research/')
+      .then(res => res.json())
+      .then(data => setResearch(data.results || []));
+    fetch('/api/resources/')
+      .then(res => res.json())
+      .then(data => setResources(data.results || []));
+    fetch('/api/community/')
+      .then(res => res.json())
+      .then(data => setCommunity(data.results || []));
+    fetch('/api/projects/')
+      .then(res => res.json())
+      .then(data => setProjects(data.results || []));
+  }, []);
+
+  // Scroll effect
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle dropdown hover
-  const handleMouseEnter = (dropdownId) => {
-    setActiveDropdown(dropdownId);
-  };
-
-  const handleMouseLeave = () => {
-    setTimeout(() => {
-      setActiveDropdown(null);
-    }, 200);
-  };
-
-  // Handle search
+  const handleMouseEnter = (dropdownId) => { setActiveDropdown(dropdownId); };
+  const handleMouseLeave = () => { setTimeout(() => setActiveDropdown(null), 200); };
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      console.log('Searching for:', searchQuery);
-      // Implement your search logic here
+      // Implement search logic...
       setSearchModalOpen(false);
       setSearchQuery('');
     }
   };
-
-  // Handle section scroll
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
   };
-
   const isActive = (path) => location.pathname === path;
+  const newsSummary = (item) => item.excerpt ? item.excerpt.substring(0, 60) : '';
+  const newsImage = (item) => item.image_thumbnail_url || item.image || '';
 
   return (
     <>
@@ -85,9 +122,7 @@ const Navbar = ({
                 </span>
               )}
             </div>
-
             <div className="col-md-6 d-flex justify-content-end align-items-center gap-3">
-              {/* Social Media Icons */}
               <div className="social-media-links d-flex align-items-center gap-2">
                 {siteSettings.facebook_url && (
                   <a href={siteSettings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-black social-link">
@@ -120,8 +155,6 @@ const Navbar = ({
                   </a>
                 )}
               </div>
-
-              {/* Quick Links Dropdown */}
               {siteSettings.quick_links && siteSettings.quick_links.length > 0 && (
                 <div className="dropdown">
                   <button className="btn btn-sm btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown">
@@ -146,7 +179,6 @@ const Navbar = ({
       {/* Main Navbar */}
       <nav className={`navbar navbar-expand-lg navbar-dark bg-primary sticky-top ${scrolled ? 'scrolled' : ''}`}>
         <div className="container-fluid">
-          {/* Mobile Toggle */}
           <button 
             className="navbar-toggler" 
             type="button" 
@@ -155,33 +187,25 @@ const Navbar = ({
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-
-          {/* Navigation Links */}
           <div className={`collapse navbar-collapse justify-content-center ${isMobileMenuOpen ? 'show' : ''}`}>
             <ul className="navbar-nav d-flex flex-row">
-              
+
               {/* Home */}
               <li className="nav-item">
-                <Link 
-                  className={`nav-link ${isActive('/') ? 'active' : ''}`} 
-                  to="/"
-                >
+                <Link className={`nav-link ${isActive('/') ? 'active' : ''}`} to="/">
                   Home
                 </Link>
               </li>
 
               {/* About Us */}
               <li 
-                className="nav-item nav-hover-content" 
+                className="nav-item nav-hover-content"
                 onMouseEnter={() => handleMouseEnter('about')}
                 onMouseLeave={handleMouseLeave}
               >
                 <Link to="/about" className="nav-link">About Us</Link>
-                
-                {/* About Dropdown */}
                 {activeDropdown === 'about' && aboutPages.length > 0 && (
-                  <div 
-                    className="hover-content-panel show"
+                  <div className="hover-content-panel show"
                     onMouseEnter={() => setActiveDropdown('about')}
                     onMouseLeave={handleMouseLeave}
                   >
@@ -233,9 +257,8 @@ const Navbar = ({
                 >
                   Leaders
                 </a>
-                
                 {activeDropdown === 'leaders' && (
-                  <div 
+                  <div
                     className="hover-content-panel show"
                     onMouseEnter={() => setActiveDropdown('leaders')}
                     onMouseLeave={handleMouseLeave}
@@ -264,7 +287,6 @@ const Navbar = ({
                 >
                   News
                 </a>
-                
                 {activeDropdown === 'news' && (
                   <div 
                     className="hover-content-panel show"
@@ -275,9 +297,9 @@ const Navbar = ({
                       <ul className="list-unstyled mb-0">
                         {news.map(item => (
                           <li key={item.id} className="d-flex align-items-start mb-3">
-                            {item.image && (
+                            {newsImage(item) && (
                               <img 
-                                src={item.image} 
+                                src={newsImage(item)} 
                                 alt={item.title} 
                                 style={{width:'50px', height:'50px', objectFit:'cover', borderRadius:'4px', marginRight:'10px'}}
                               />
@@ -287,7 +309,7 @@ const Navbar = ({
                                 {item.title}
                               </a>
                               <p className="mb-0 text-muted" style={{fontSize: '0.85rem'}}>
-                                {item.summary?.substring(0, 60)}...
+                                {newsSummary(item)}...
                               </p>
                             </div>
                           </li>
@@ -319,7 +341,6 @@ const Navbar = ({
                 >
                   Events
                 </a>
-                
                 {activeDropdown === 'events' && (
                   <div 
                     className="hover-content-panel show"
@@ -352,7 +373,6 @@ const Navbar = ({
                 ) : (
                   <a href="#" className="nav-link">Research</a>
                 )}
-                
                 {activeDropdown === 'research' && research && research.length > 0 && (
                   <div 
                     className="hover-content-panel show"
@@ -377,7 +397,6 @@ const Navbar = ({
                 onMouseLeave={handleMouseLeave}
               >
                 <a href="#" className="nav-link">Resources</a>
-                
                 {activeDropdown === 'resources' && resources && resources.length > 0 && (
                   <div 
                     className="hover-content-panel show"
@@ -417,7 +436,6 @@ const Navbar = ({
                 onMouseLeave={handleMouseLeave}
               >
                 <a href="#" className="nav-link">Communities</a>
-                
                 {activeDropdown === 'community' && (
                   <div 
                     className="hover-content-panel show"
@@ -425,10 +443,17 @@ const Navbar = ({
                     onMouseLeave={handleMouseLeave}
                   >
                     <ul className="list-unstyled">
-                      <li>
-                        <Link to="/communities/indabax">IndabaX</Link>
-                      </li>
-                      {/* Add more hardcoded community links here if needed */}
+                      {community && community.length > 0 ? (
+                        community.map(item => (
+                          <li key={item.id}>
+                            <Link to={`/community/${item.id}`}>{item.name || item.title}</Link>
+                          </li>
+                        ))
+                      ) : (
+                        <li>
+                          <Link to="/communities/indabax">IndabaX</Link>
+                        </li>
+                      )}
                     </ul>
                   </div>
                 )}
@@ -450,7 +475,6 @@ const Navbar = ({
                 >
                   Projects
                 </a>
-                
                 {activeDropdown === 'projects' && projects && projects.length > 0 && (
                   <div 
                     className="hover-content-panel show"
@@ -486,7 +510,7 @@ const Navbar = ({
       {/* Search Modal */}
       {searchModalOpen && (
         <div className="modal fade show" style={{display: 'block'}} onClick={() => setSearchModalOpen(false)}>
-          <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-dialog" onClick={e => e.stopPropagation()}>
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Search</h5>
@@ -500,7 +524,7 @@ const Navbar = ({
                       className="form-control" 
                       placeholder="Search..." 
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={e => setSearchQuery(e.target.value)}
                       autoFocus
                     />
                     <button className="btn btn-primary" type="submit">

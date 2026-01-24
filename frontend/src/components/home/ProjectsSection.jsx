@@ -1,38 +1,48 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import './ProjectsSection.css';
 
-const ProjectsSection = ({ initialProjects = [] }) => {
-  const [projects, setProjects] = useState(initialProjects);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [hasNextPage, setHasNextPage] = useState(true);
-  const [loadedProjectIds, setLoadedProjectIds] = useState(new Set());
+const ProjectsSection = () => {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   const sliderWrapperRef = useRef(null);
   const sliderRef = useRef(null);
   const scrollTimeoutRef = useRef(null);
 
   const CONFIG = {
-    cardWidth: 350,
-    gap: 30,
     scrollAmount: 380,
-    maxDepth: 5,
     scrollDebounce: 100,
     animationDelay: 200,
-    fetchTimeout: 8000
   };
 
-  // Initialize loaded project IDs
+  // Fetch projects from API
   useEffect(() => {
-    const ids = new Set(initialProjects.map(p => p.id.toString()));
-    setLoadedProjectIds(ids);
-  }, [initialProjects]);
+    axios.get('/api/projects/')
+      .then(res => {
+        const data = res.data.results || res.data || [];
+        console.log('Fetched projects:', data);
+        
+        // If is_published field exists, filter by it; otherwise use all projects
+        const publishedProjects = data.filter(project => 
+          project.is_published === undefined || project.is_published === true
+        );
+        setProjects(publishedProjects);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error loading projects:', err);
+        setError('Failed to load projects.');
+        setLoading(false);
+      });
+  }, []);
 
   // Update mid-card highlight
   const updateMidCardHighlight = () => {
     if (!sliderRef.current || !sliderWrapperRef.current) return;
 
-    const cards = sliderRef.current.querySelectorAll('.project-card:not(.loading-card)');
+    const cards = sliderRef.current.querySelectorAll('.project-card');
     cards.forEach(card => card.classList.remove('mid-card'));
 
     const wrapperRect = sliderWrapperRef.current.getBoundingClientRect();
@@ -48,19 +58,6 @@ const ProjectsSection = ({ initialProjects = [] }) => {
     if (visibleCards.length >= 3) {
       visibleCards[1].classList.add('mid-card');
     }
-  };
-
-  // Update button states
-  const updateButtonStates = () => {
-    if (!sliderWrapperRef.current) return;
-
-    const scrollLeft = sliderWrapperRef.current.scrollLeft;
-    const maxScroll = sliderWrapperRef.current.scrollWidth - sliderWrapperRef.current.clientWidth;
-
-    return {
-      leftDisabled: scrollLeft <= 0,
-      rightDisabled: loading || (!hasNextPage && scrollLeft >= maxScroll - 10)
-    };
   };
 
   // Handle scroll events
@@ -88,7 +85,6 @@ const ProjectsSection = ({ initialProjects = [] }) => {
 
     wrapper.addEventListener('scroll', throttledScroll, { passive: true });
     
-    // Initial highlight
     requestAnimationFrame(() => {
       updateMidCardHighlight();
     });
@@ -101,70 +97,9 @@ const ProjectsSection = ({ initialProjects = [] }) => {
     };
   }, [projects]);
 
-  // Fetch more projects
-  const fetchProjects = async (page) => {
-    if (loading || !hasNextPage || page > CONFIG.maxDepth) return false;
-
-    setLoading(true);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), CONFIG.fetchTimeout);
-
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/projects/?page=${page}`, {
-        signal: controller.signal,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (data.projects && data.projects.length > 0) {
-        const newProjects = data.projects.filter(
-          proj => !loadedProjectIds.has(proj.id.toString())
-        );
-
-        if (newProjects.length > 0) {
-          setProjects(prev => [...prev, ...newProjects]);
-          setLoadedProjectIds(prev => {
-            const newSet = new Set(prev);
-            newProjects.forEach(p => newSet.add(p.id.toString()));
-            return newSet;
-          });
-        }
-
-        setHasNextPage(data.has_next);
-
-        requestAnimationFrame(() => {
-          updateMidCardHighlight();
-        });
-
-        return newProjects.length > 0;
-      } else {
-        setHasNextPage(false);
-        return false;
-      }
-    } catch (error) {
-      clearTimeout(timeoutId);
-      console.error('Error fetching projects:', error);
-      setHasNextPage(false);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Slide left
   const slideLeft = () => {
-    if (loading || !sliderWrapperRef.current) return;
+    if (!sliderWrapperRef.current) return;
 
     const currentScroll = sliderWrapperRef.current.scrollLeft;
     const newScroll = Math.max(0, currentScroll - CONFIG.scrollAmount);
@@ -179,44 +114,38 @@ const ProjectsSection = ({ initialProjects = [] }) => {
   };
 
   // Slide right
-  const slideRight = async () => {
-    if (loading || !sliderWrapperRef.current) return;
+  const slideRight = () => {
+    if (!sliderWrapperRef.current) return;
 
     const currentScroll = sliderWrapperRef.current.scrollLeft;
     const maxScroll = sliderWrapperRef.current.scrollWidth - sliderWrapperRef.current.clientWidth;
+    const newScroll = Math.min(maxScroll, currentScroll + CONFIG.scrollAmount);
 
-    if (currentScroll >= maxScroll - CONFIG.scrollAmount && hasNextPage && !loading) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      const loaded = await fetchProjects(nextPage);
+    sliderWrapperRef.current.scrollTo({ left: newScroll, behavior: 'smooth' });
 
-      if (loaded) {
-        setTimeout(() => {
-          const newMaxScroll = sliderWrapperRef.current.scrollWidth - sliderWrapperRef.current.clientWidth;
-          const newScroll = Math.min(newMaxScroll, currentScroll + CONFIG.scrollAmount);
-          sliderWrapperRef.current.scrollTo({ left: newScroll, behavior: 'smooth' });
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        updateMidCardHighlight();
+      });
+    }, CONFIG.animationDelay);
+  };
 
-          setTimeout(() => {
-            requestAnimationFrame(() => {
-              updateMidCardHighlight();
-            });
-          }, CONFIG.animationDelay);
-        }, 100);
-      }
-    } else {
-      const newScroll = Math.min(maxScroll, currentScroll + CONFIG.scrollAmount);
-      sliderWrapperRef.current.scrollTo({ left: newScroll, behavior: 'smooth' });
+  // Update button states
+  const getButtonStates = () => {
+    if (!sliderWrapperRef.current) return { leftDisabled: true, rightDisabled: true };
 
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          updateMidCardHighlight();
-        });
-      }, CONFIG.animationDelay);
-    }
+    const scrollLeft = sliderWrapperRef.current.scrollLeft;
+    const maxScroll = sliderWrapperRef.current.scrollWidth - sliderWrapperRef.current.clientWidth;
+
+    return {
+      leftDisabled: scrollLeft <= 0,
+      rightDisabled: scrollLeft >= maxScroll - 10
+    };
   };
 
   // Format date
   const formatDate = (dateString) => {
+    if (!dateString) return '';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -230,75 +159,122 @@ const ProjectsSection = ({ initialProjects = [] }) => {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
-  const buttonStates = updateButtonStates();
+  if (loading) {
+    return (
+      <section className="projects-slider-section" id="projects-section">
+        <div className="container">
+          <h2 className="section-title">Our Latest Projects</h2>
+          <div className="loading-card">
+            <div className="loading-spinner">Loading projects...</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="projects-slider-section" id="projects-section">
+        <div className="container">
+          <h2 className="section-title">Our Latest Projects</h2>
+          <div className="alert alert-danger">{error}</div>
+        </div>
+      </section>
+    );
+  }
+
+  const buttonStates = getButtonStates();
 
   return (
     <section className="projects-slider-section" id="projects-section">
       <div className="container">
         <h2 className="section-title">Our Latest Projects</h2>
-        <div className="projects-slider-wrapper" id="projectsSliderWrapper" ref={sliderWrapperRef}>
-          <div className="projects-slider" id="projectsSlider" ref={sliderRef}>
-            {projects.map((project, index) => (
-              <div
-                key={project.id}
-                className={`project-card ${index === 1 ? 'mid-card' : ''}`}
-                data-project-id={project.id}
-              >
-                <img
-                  src={project.image || `${process.env.REACT_APP_MEDIA_URL}/default-project.jpg`}
-                  alt={project.title}
-                  className="project-image"
-                  loading="lazy"
-                />
-                <div className="project-content">
-                  <h3 className="project-title">{project.title}</h3>
-                  <p className="project-summary">{truncateText(project.summary, 100)}</p>
-                  <div className="project-meta">
-                    <span className="project-date">{formatDate(project.publish_date)}</span>
-                    {project.url && (
-                      <a
-                        href={project.url}
-                        className="project-link"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Learn More
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            {loading && (
-              <div className="project-card loading-card">
-                <div className="loading-spinner">Loading...</div>
-              </div>
-            )}
-          </div>
-        </div>
         
-        {/* Slider navigation buttons */}
-        <div className="slider-nav-container">
-          <button
-            className="slider-btn"
-            id="slideLeft"
-            type="button"
-            onClick={slideLeft}
-            disabled={buttonStates?.leftDisabled}
-          >
-            <i className="fas fa-chevron-left"></i>
-          </button>
-          <button
-            className="slider-btn"
-            id="slideRight"
-            type="button"
-            onClick={slideRight}
-            disabled={buttonStates?.rightDisabled}
-          >
-            <i className="fas fa-chevron-right"></i>
-          </button>
-        </div>
+        {projects.length === 0 ? (
+          <div className="text-center py-5">
+            <p>No projects available at the moment.</p>
+          </div>
+        ) : (
+          <>
+            <div className="projects-slider-wrapper" ref={sliderWrapperRef}>
+              <div className="projects-slider" ref={sliderRef}>
+                {projects.map((project, index) => (
+                  <div
+                    key={project.id}
+                    className={`project-card ${index === 1 ? 'mid-card' : ''}`}
+                  >
+                    {project.image_thumbnail_url && (
+                      <img
+                        src={project.image_thumbnail_url}
+                        alt={project.title}
+                        className="project-image"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    )}
+                    <div className="project-content">
+                      <h3 className="project-title">{project.title}</h3>
+                      <p className="project-summary">
+                        {truncateText(project.short_description, 100)}
+                      </p>
+                      
+                      {project.technologies_list && project.technologies_list.length > 0 && (
+                        <div className="project-technologies">
+                          {project.technologies_list.slice(0, 3).map((tech, idx) => (
+                            <span key={idx} className="tech-badge">{tech}</span>
+                          ))}
+                          {project.technologies_list.length > 3 && (
+                            <span className="tech-badge">+{project.technologies_list.length - 3}</span>
+                          )}
+                        </div>
+                      )}
+                      
+                      <div className="project-meta">
+                        {project.status && (
+                          <span className={`project-status status-${project.status}`}>
+                            {project.status.replace('_', ' ')}
+                          </span>
+                        )}
+                        {(project.demo_url || project.github_url) && (
+                          <a
+                            href={project.demo_url || project.github_url}
+                            className="project-link"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {project.demo_url ? 'View Demo' : 'View Code'}
+                            <i className="fas fa-arrow-right"></i>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="slider-nav-container">
+              <button
+                className="slider-btn"
+                type="button"
+                onClick={slideLeft}
+                disabled={buttonStates.leftDisabled}
+              >
+                <i className="fas fa-chevron-left"></i>
+              </button>
+              <button
+                className="slider-btn"
+                type="button"
+                onClick={slideRight}
+                disabled={buttonStates.rightDisabled}
+              >
+                <i className="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

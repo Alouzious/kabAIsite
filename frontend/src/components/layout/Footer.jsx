@@ -1,8 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import './Footer.css';
 
-const Footer = ({ siteSettings = {}, contactInfo = {} }) => {
+const Footer = () => {
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [siteSettings, setSiteSettings] = useState({});
+  const [quickLinks, setQuickLinks] = useState([]);
+
+  // Fetch site settings and quick links directly in Footer
+  useEffect(() => {
+    // Fetch site settings
+    fetch('/api/core/site-settings/')
+      .then(res => res.json())
+      .then(data => {
+        console.log('Footer - Site settings response:', data);
+        
+        if (data.results && Array.isArray(data.results) && data.results.length > 0) {
+          setSiteSettings(data.results[0]);
+        } else if (Array.isArray(data) && data.length > 0) {
+          setSiteSettings(data[0]);
+        } else if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+          setSiteSettings(data);
+        } else {
+          setSiteSettings({});
+        }
+      })
+      .catch(error => {
+        console.error('Footer - Error fetching site settings:', error);
+        setSiteSettings({});
+      });
+
+    // Fetch quick links separately
+    fetch('/api/core/quick-links/')
+      .then(res => res.json())
+      .then(data => {
+        console.log('Footer - Quick links response:', data);
+        const links = data.results || data || [];
+        const activeLinks = links
+          .filter(link => link.is_active)
+          .sort((a, b) => (a.order || 0) - (b.order || 0));
+        setQuickLinks(activeLinks);
+      })
+      .catch(error => console.error('Footer - Error fetching quick links:', error));
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,8 +67,8 @@ const Footer = ({ siteSettings = {}, contactInfo = {} }) => {
   return (
     <footer>   
       <div className="footer-top">     
-        <h5>🤖 KUAI Club – Kabale University</h5>     
-        <p>Empowering the next generation of AI innovators at KU.</p>   
+        <h5>🤖 {siteSettings.site_name || 'KUAI Club'} – Kabale University</h5>     
+        <p>{siteSettings.site_tagline || 'Empowering the next generation of AI innovators at KU.'}</p>   
       </div>    
       
       <div className="footer-columns">     
@@ -37,10 +76,14 @@ const Footer = ({ siteSettings = {}, contactInfo = {} }) => {
         <div className="footer-section">       
           <h6>⚡ QUICK LINKS</h6>       
           <ul>         
-            {siteSettings.quick_links && siteSettings.quick_links.length > 0 ? (
-              siteSettings.quick_links.map((link, index) => (
-                <li key={index}>
-                  <a href={link.url} target="_blank" rel="noopener noreferrer">
+            {quickLinks.length > 0 ? (
+              quickLinks.map((link) => (
+                <li key={link.id}>
+                  <a 
+                    href={link.url} 
+                    target={link.open_new_tab ? "_blank" : "_self"}
+                    rel={link.open_new_tab ? "noopener noreferrer" : undefined}
+                  >
                     {link.name}
                   </a>
                 </li>
@@ -54,22 +97,25 @@ const Footer = ({ siteSettings = {}, contactInfo = {} }) => {
         {/* CONTACT US */}     
         <div className="footer-section">       
           <h6>📞 CONTACT US</h6>       
-          {contactInfo.address && (
-            <p className="contact-item">{contactInfo.address}</p>
+          {siteSettings.address && (
+            <p className="contact-item">📍 {siteSettings.address}</p>
           )}
-          {contactInfo.email && (
+          {siteSettings.contact_email && (
             <p className="contact-item">
-              📧 <a href={`mailto:${contactInfo.email}`} className="contact-link">
-                {contactInfo.email}
+              📧 <a href={`mailto:${siteSettings.contact_email}`} className="contact-link">
+                {siteSettings.contact_email}
               </a>
             </p>
           )}
-          {contactInfo.phone && (
+          {siteSettings.contact_phone && (
             <p className="contact-item">
-              ☎ <a href={`tel:${contactInfo.phone}`} className="contact-link">
-                {contactInfo.phone}
+              ☎ <a href={`tel:${siteSettings.contact_phone}`} className="contact-link">
+                {siteSettings.contact_phone}
               </a>
             </p>
+          )}
+          {!siteSettings.address && !siteSettings.contact_email && !siteSettings.contact_phone && (
+            <p className="text-muted">Loading contact info...</p>
           )}
         </div>      
 
@@ -119,6 +165,10 @@ const Footer = ({ siteSettings = {}, contactInfo = {} }) => {
                 </a>
               </li>
             )}
+            {!siteSettings.facebook_url && !siteSettings.twitter_url && !siteSettings.instagram_url && 
+             !siteSettings.linkedin_url && !siteSettings.youtube_url && !siteSettings.whatsapp_url && (
+              <li><span className="text-muted">No social links yet</span></li>
+            )}
           </ul>    
         </div>   
       </div>    
@@ -134,7 +184,7 @@ const Footer = ({ siteSettings = {}, contactInfo = {} }) => {
         >
           <span className="back-to-top-icon">⬆</span> Back to Top
         </a>     
-        <p className="copyright">© 2025 KUAI Club. All rights reserved.</p>     
+        <p className="copyright">© 2025 {siteSettings.site_name || 'KUAI Club'}. All rights reserved.</p>     
         <p className="designer-credit">
           Designed with <span className="heart">❤️</span> by <strong>Alouzious</strong>
         </p>   

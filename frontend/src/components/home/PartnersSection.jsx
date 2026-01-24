@@ -1,33 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import './PartnersSection.css';
 
-const PartnersSection = ({ initialPartners = [] }) => {
-  const [partners, setPartners] = useState(initialPartners);
-  const [loading, setLoading] = useState(false);
+const PartnersSection = () => {
+  const [partners, setPartners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sectionRef = useRef(null);
   const cardsRef = useRef([]);
 
-  // Fetch partners from API
   useEffect(() => {
-    if (initialPartners.length === 0) {
-      fetchPartners();
-    }
+    axios.get('/api/partners/')
+      .then(res => {
+        const data = res.data.results || res.data || [];
+        const activePartners = data.filter(partner => partner.is_active);
+        setPartners(activePartners);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('ERROR loading partners:', err);
+        setError('Failed to load partners.');
+        setLoading(false);
+      });
   }, []);
 
-  const fetchPartners = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/partners/`);
-      const data = await response.json();
-      setPartners(data);
-    } catch (error) {
-      console.error('Error fetching partners:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Intersection Observer for scroll-triggered animations
   useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
@@ -45,7 +41,7 @@ const PartnersSection = ({ initialPartners = [] }) => {
     };
 
     const observer = new IntersectionObserver((entries) => {
-      entries. forEach(entry => {
+      entries.forEach(entry => {
         if (entry.isIntersecting) {
           animateCards();
           observer.disconnect();
@@ -60,28 +56,24 @@ const PartnersSection = ({ initialPartners = [] }) => {
     return () => observer.disconnect();
   }, [partners]);
 
-  const handleWebsiteLinkClick = (partnerName, websiteUrl) => {
-    // Optional: Add analytics tracking
-    console.log('Partner website clicked:', websiteUrl, 'Partner:', partnerName);
-  };
-
-  const getPartnerTypeDisplay = (type) => {
-    const typeMap = {
-      'collaborator': 'Collaborator',
-      'sponsor': 'Sponsor',
-      'partner': 'Partner',
-      'supporter': 'Supporter'
-    };
-    return typeMap[type] || type;
-  };
-
   if (loading) {
     return (
       <section id="partners" className="partners-section">
         <div className="container">
           <div className="partners-loading">
             <div className="partners-spinner"></div>
+            <p>Loading partners...</p>
           </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section id="partners" className="partners-section">
+        <div className="container">
+          <div className="alert alert-danger">{error}</div>
         </div>
       </section>
     );
@@ -91,62 +83,44 @@ const PartnersSection = ({ initialPartners = [] }) => {
     <section id="partners" className="partners-section" ref={sectionRef}>
       <div className="container">
         <h2 className="partners-title">Our Partners</h2>
-
         <div className="partners-grid">
-          {partners. length > 0 ? (
-            partners.map((partner, index) => (
-              <div
-                key={partner.id}
-                className="partner-col"
-                ref={el => cardsRef.current[index] = el}
-              >
-                <div className="partner-card fade-in-up">
-                  {partner.image && (
-                    <a
-                      href={partner.website_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="partner-image-link"
-                    >
-                      <img
-                        src={partner.image}
-                        className="partner-image"
-                        alt={partner.name}
-                        loading="lazy"
-                      />
-                    </a>
-                  )}
-                  <div className="partner-card-body">
-                    <h6 className="partner-card-title">{partner.name}</h6>
-                    <span className="partner-type">
-                      {getPartnerTypeDisplay(partner.partner_type)}
-                    </span>
-                    {partner.description && (
-                      <p className="partner-card-text">
-                        {partner.description. split(' ').slice(0, 20).join(' ')}
-                        {partner.description.split(' ').length > 20 ?  '...' : ''}
-                      </p>
-                    )}
-                    {partner.website_link && (
-                      <a
-                        href={partner.website_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="partner-website-link"
-                        onClick={() => handleWebsiteLinkClick(partner.name, partner. website_link)}
-                      >
-                        <span>Visit Website</span>
-                        <i className="fas fa-external-link-alt"></i>
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
+          {partners.length === 0 ? (
             <div className="partners-no-data">
               <p>No partners available at the moment.</p>
             </div>
+          ) : (
+            partners.map((partner, index) => (
+              <div key={partner.id} className="partner-card fade-in-up" ref={el => cardsRef.current[index] = el}>
+                {partner.logo_url && (
+                  <a href={partner.website_url || '#'} target="_blank" rel="noopener noreferrer" className="partner-image-link">
+                    <img 
+                      src={partner.logo_url} 
+                      className="partner-image" 
+                      alt={partner.name} 
+                      loading="lazy"
+                    />
+                  </a>
+                )}
+                <div className="partner-card-body">
+                  <h6 className="partner-card-title">{partner.name}</h6>
+                  {partner.partnership_level && (
+                    <span className="partner-type">{partner.partnership_level}</span>
+                  )}
+                  {partner.description && (
+                    <p className="partner-card-text">
+                      {partner.description.split(' ').slice(0, 20).join(' ')}
+                      {partner.description.split(' ').length > 20 ? '...' : ''}
+                    </p>
+                  )}
+                  {partner.website_url && (
+                    <a href={partner.website_url} target="_blank" rel="noopener noreferrer" className="partner-website-link">
+                      <span>Visit Website</span>
+                      <i className="fas fa-external-link-alt"></i>
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))
           )}
         </div>
       </div>
